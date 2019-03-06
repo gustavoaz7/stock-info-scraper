@@ -1,0 +1,23 @@
+{
+  "name": "stock-info-scraper",
+  "version": "1.0.0",
+  "description": "A web scraping project to automate my stock analysis",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "cheerio": "^1.0.0-rc.2"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gustavoaz7/stock-info-scraper.git"
+  },
+  "author": "gustavoaz7",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gustavoaz7/stock-info-scraper/issues"
+  },
+  "homepage": "https://github.com/gustavoaz7/stock-info-scraper#readme"
+}
