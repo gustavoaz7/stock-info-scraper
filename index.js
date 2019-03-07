@@ -45,9 +45,18 @@ workbook.xlsx
     verifyIndicators(indicators);
 
     const stockCodes = worksheet.getColumn(1).values.slice(2);
-    console.log('stockid', stockCodes[0]);
-    scrapeStockInfo(stockCodes[1]).then(stockInfo => {
-      console.log('stockInfo', stockInfo);
+    const indexTest = 1;
+    console.log('stockCode', stockCodes[indexTest]);
+    const test = worksheet.getRow(2 + indexTest);
+
+    scrapeStockInfo(stockCodes[indexTest]).then(stockInfo => {
+      // console.log('stockInfo', stockInfo);
+      STOCK_INDICATORS.forEach((indicator, i) => {
+        console.log('stockInfo[indicator]', stockInfo[indicator]);
+        test.getCell(3 + i).value = stockInfo[indicator];
+      });
+
+      return workbook.xlsx.writeFile('./Stock Analysis.xlsx');
     });
   })
   .catch(e => {
