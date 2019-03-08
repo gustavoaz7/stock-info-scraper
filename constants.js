@@ -1,5 +1,7 @@
 module.exports = {
   BASE_URL: 'http://www.fundamentus.com.br/detalhes.php?papel=',
+  FIRST_STOCK_ROW: 2,
+  FIRST_INDICATOR_COLUMN: 3,
   STOCK_INDICATORS: [
     'P',
     'A',
