@@ -27,7 +27,7 @@ module.exports = {
         return info;
       })
       .catch(() => {
-        console.log('Error trying to fetch stock info for:', stockCode);
+        throw Error();
       });
   },
 };
