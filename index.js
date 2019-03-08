@@ -1,37 +1,9 @@
 require('./ArrayEquals');
-const axios = require('axios');
-const cheerio = require('cheerio');
 const Excel = require('exceljs');
 const workbook = new Excel.Workbook();
-const {
-  BASE_URL,
-  STOCK_INDICATORS,
-  STOCK_INDICATORS_INDEX,
-} = require('./constants');
-
-function scrapeStockInfo(stockCode) {
-  return axios
-    .get(BASE_URL + stockCode)
-    .then(res => res.data)
-    .then(html => {
-      const $ = cheerio.load(html);
-      const info = {};
-
-      $('td.data>span.txt').each((i, elem) => {
-        const indicator = STOCK_INDICATORS[STOCK_INDICATORS_INDEX.indexOf(i)];
-        if (indicator) {
-          info[indicator] = $(elem)
-            .text()
-            .trim();
-        }
-      });
-
-      return info;
-    })
-    .catch(() => {
-      console.log('Error trying to fetch stock info for:', stockCode);
-    });
-}
+const { STOCK_INDICATORS } = require('./constants');
+const { scrapeStockInfo } = require('./API');
+const { verifyIndicators } = require('./helpers');
 
 workbook.xlsx
   .readFile('./Stock Analysis.xlsx')
@@ -62,11 +34,3 @@ workbook.xlsx
   .catch(e => {
     console.log(e);
   });
-
-function verifyIndicators(indicators) {
-  if (!indicators.equals(STOCK_INDICATORS)) {
-    throw new Error(
-      'Scrape indicators does not match those from spreadsheet. Please double check before proceeding'
-    );
-  }
-}
