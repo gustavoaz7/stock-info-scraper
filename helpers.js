@@ -13,4 +13,16 @@ module.exports = {
       setTimeout(resolve, timer);
     });
   },
+  /**
+   * For some weird reason, everytime exceljs access my spreadsheet it hides every column and row.
+   * This function is a workaround for this issue, making my table visible again.
+   */
+  makeTableVisible: ({ worksheet, indicators }) => {
+    indicators.forEach((e, i) => {
+      worksheet.getColumn(i).hidden = false;
+    });
+    worksheet.eachRow(row => {
+      row.hidden = false;
+    });
+  },
 };

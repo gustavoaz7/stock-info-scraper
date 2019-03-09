@@ -2,7 +2,7 @@ require('./ArrayEquals');
 const Excel = require('exceljs');
 const workbook = new Excel.Workbook();
 const { scrapeStockInfo } = require('./API');
-const { verifyIndicators, sleep } = require('./helpers');
+const { verifyIndicators, sleep, makeTableVisible } = require('./helpers');
 const {
   STOCK_INDICATORS,
   FIRST_STOCK_ROW,
@@ -15,6 +15,7 @@ const {
     const worksheet = spreadSheet.getWorksheet(1);
     // worksheet works in a 1-based column/row number (first element is empty)
     let indicators = worksheet.getRow(1).values;
+    makeTableVisible({ worksheet, indicators });
     // remove two last which are calculated using other indicators
     indicators = indicators.slice(FIRST_INDICATOR_COLUMN, -2);
 
