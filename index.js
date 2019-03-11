@@ -1,7 +1,7 @@
 require('./ArrayEquals');
 const Excel = require('exceljs');
 const workbook = new Excel.Workbook();
-const { scrapeStockInfo } = require('./API');
+const { scrapeStockInfo, setCookie } = require('./API');
 const { verifyIndicators, sleep, makeTableVisible } = require('./helpers');
 const {
   STOCK_INDICATORS,
@@ -9,7 +9,17 @@ const {
   FIRST_INDICATOR_COLUMN,
 } = require('./constants');
 
-(async function() {
+const inputedStockCode = process.argv.slice(2);
+init(inputedStockCode);
+
+async function init(inputedStockCode) {
+  try {
+    await setCookie();
+  } catch (e) {
+    console.log('Error accessing home website');
+    return;
+  }
+
   try {
     const spreadSheet = await workbook.xlsx.readFile('./Stock Analysis.xlsx');
     const worksheet = spreadSheet.getWorksheet(1);
@@ -21,11 +31,13 @@ const {
 
     verifyIndicators(indicators);
 
-    const stockCodes = worksheet.getColumn(1).values.slice(FIRST_STOCK_ROW);
+    const stockCodes = inputedStockCode.length
+      ? inputedStockCode
+      : worksheet.getColumn(1).values.slice(FIRST_STOCK_ROW);
     const stockCodesSize = stockCodes.length;
     const failedStocks = [];
     for (let index = 0; index < stockCodesSize; index++) {
-      await sleep(1500);
+      index > 0 && (await sleep(1500));
       const stockCode = stockCodes[index];
       const remainingItems = stockCodesSize - (index + 1);
       const stockRow = worksheet.getRow(FIRST_STOCK_ROW + index);
@@ -33,25 +45,31 @@ const {
         remainingItems > 0
           ? `only ${remainingItems} remaining`
           : 'this is the last one!';
+
       try {
         console.log(`Fetching ${stockCode} ... ${remainingMessage}`);
         const stockInfo = await scrapeStockInfo(stockCode);
         console.log('\u2713');
         STOCK_INDICATORS.forEach((indicator, i) => {
-          stockRow.getCell(FIRST_INDICATOR_COLUMN + i).value =
-            stockInfo[indicator];
+          const currentCell = stockRow.getCell(FIRST_INDICATOR_COLUMN + i);
+          currentCell.value = stockInfo[indicator];
         });
       } catch (e) {
         console.log('X');
         failedStocks.push(stockCode);
       }
     }
+
     if (failedStocks.length) {
       console.log('\nFailed fetching stock info for the following companies:');
       console.log(failedStocks.join('  '));
     }
-    return workbook.xlsx.writeFile('./Stock Analysis.xlsx');
+
+    await workbook.xlsx.writeFile('./Stock Analysis.xlsx');
+    console.log('Done!');
+
+    return;
   } catch (e) {
     console.log(e);
   }
-})();
+}
